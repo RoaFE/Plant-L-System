@@ -8,7 +8,7 @@ public class Plant : MonoBehaviour
     Node rootNode;
     public int nodeDepth;
     public float nodeDistance;
-
+    public int splitDepth, splitFrequency, splitCount;
     public void Generate()
     {
         if(rootNode == null)
