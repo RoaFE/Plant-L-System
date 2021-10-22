@@ -58,6 +58,7 @@ public class Node : MonoBehaviour
 
                 GameObject obj = Instantiate(newObj,dir*dist,Quaternion.identity,this.transform);
                 obj.transform.position = transform.position + (direction * dist);
+                obj.transform.localRotation = Quaternion.AngleAxis(Random.Range(plant.nodeRotationMin,plant.nodeRotationMax),dir);
                 childNodes.Add(obj.AddComponent<Node>());
                 childNodes[i].InitNode(plant,this);
                 result &= childNodes[i].Extend(nodeDepth - 1,direction,dist);
@@ -68,6 +69,7 @@ public class Node : MonoBehaviour
             GameObject newObj = new GameObject(string.Format("Node {0}",plant.nodeDepth - nodeDepth));
             GameObject obj = Instantiate(newObj,dir*dist,Quaternion.identity,this.transform);
             obj.transform.position = transform.position + (dir.normalized * dist);
+            obj.transform.localRotation = Quaternion.AngleAxis(Random.Range(plant.nodeRotationMin,plant.nodeRotationMax),dir);
             DestroyImmediate(newObj);
             childNodes.Add(obj.AddComponent<Node>());
             childNodes[childNodes.Count - 1].InitNode(plant,this);

@@ -5,6 +5,8 @@ using UnityEngine;
 public class Plant : MonoBehaviour
 {
     [SerializeField]
+
+    bool generated = false;
     Node rootNode;
     public int nodeDepth;
     public float nodeDistance;
@@ -14,6 +16,11 @@ public class Plant : MonoBehaviour
 
     [Range(-1,1)]
     public float randomisationPercentage;
+
+    [Range(-180,180)]
+    public float nodeRotationMin,nodeRotationMax;
+
+    public int leafDepth, leafFrequency;
     public void Generate()
     {
         if(rootNode == null)
@@ -21,7 +28,8 @@ public class Plant : MonoBehaviour
             rootNode = gameObject.AddComponent<Node>();            
             rootNode.InitNode(this,null);
         }
-        rootNode.Extend(nodeDepth,Vector3.up,nodeDistance);        
+        rootNode.Extend(nodeDepth,Vector3.up,nodeDistance); 
+        generated = true;       
     }
     
     public void Clear()
@@ -30,6 +38,7 @@ public class Plant : MonoBehaviour
         {
             rootNode.Clear();
         }
+        generated = false;
     }
 
     public List<Vector3> nodePosition()
