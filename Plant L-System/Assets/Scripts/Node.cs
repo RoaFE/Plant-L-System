@@ -8,6 +8,12 @@ public class Node : MonoBehaviour
     Node parentNode;
     List<Node> childNodes;
     public Vector3 position = Vector3.zero;
+
+    Plane splitPlane;
+
+    int depth;
+
+    public Vector3 planeNormal;
     //Stem stem;
 
     public void InitNode(Plant inPlant, Node inPrevNode)
@@ -18,7 +24,8 @@ public class Node : MonoBehaviour
         {
             parentNode = inPrevNode;
         }
-        
+        planeNormal = transform.forward;
+        splitPlane = new Plane(planeNormal,transform.position);
     }
 
     // Start is called before the first frame update
@@ -33,25 +40,27 @@ public class Node : MonoBehaviour
         {
             return true;
         }
+        depth = nodeDepth;
         Vector3 randomDir = Random.insideUnitSphere.normalized;
         dir = Vector3.Lerp(dir,randomDir,plant.randomisationPercentage);
         
         bool result = true;
         if(plant.nodeDepth - nodeDepth >= plant.splitDepth && ((plant.nodeDepth - nodeDepth) - plant.splitDepth) % plant.splitFrequency == 0)
         {
-            Plane plane = new Plane(transform.position,dir,transform.right);
+            
             GameObject newObj = new GameObject(string.Format("Node {0}",plant.nodeDepth - nodeDepth));
             float angleStep = plant.splitAngle / plant.splitCount;
             for(int i = 0; i < plant.splitCount; i++)
             {
-                float angle = angleStep * i + (angleStep / 2);
+                float angle = angleStep * i + (angleStep / 2) - (plant.splitAngle / 2);
                 float percentage = angle / plant.splitAngle;
-                Vector3 direction = Vector3.ProjectOnPlane(plant.DirFromAngle(angle,false).normalized,plane.normal).normalized;
+                Vector3 direction = Quaternion.AngleAxis(angle,splitPlane.normal) * dir;
+
                 GameObject obj = Instantiate(newObj,dir*dist,Quaternion.identity,this.transform);
                 obj.transform.position = transform.position + (direction * dist);
                 childNodes.Add(obj.AddComponent<Node>());
                 childNodes[i].InitNode(plant,this);
-                result &= childNodes[i].Extend(nodeDepth - 1,dir,dist);
+                result &= childNodes[i].Extend(nodeDepth - 1,direction,dist);
             }
             DestroyImmediate(newObj);
         }

@@ -17,6 +17,8 @@ public class NodeEditor : Editor {
                 Handles.color = Color.green;
                 Handles.DrawLine(node.transform.position,childnode.transform.position);
             }
+            Handles.color = Color.red;
+            Handles.DrawWireCube(node.transform.position,Vector3.one * 0.05f);
         }
         Handles.color = Color.red;
         Handles.DrawWireArc(curNode.transform.position,Vector3.up,Vector3.forward,360,0.5f);
