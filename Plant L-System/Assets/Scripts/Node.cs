@@ -130,4 +130,14 @@ public class Node : MonoBehaviour
     {
 
     }
+
+    public List<Node> GetParentNodes()
+    {
+        List<Node> parentNodes = new List<Node>();        
+        if(parentNode)
+        {
+            parentNodes.AddRange(parentNode.GetParentNodes());
+        }
+        return parentNodes;
+    }
 }
