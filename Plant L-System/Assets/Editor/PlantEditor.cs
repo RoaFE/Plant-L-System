@@ -28,9 +28,8 @@ public class PlantEditor : Editor
         Plant  plant = (Plant)target;
 
 
-        if(DrawDefaultInspector())
+        if(DrawDefaultInspector() && plant.AutoUpdate())
         {
-            if(plant.autoUpdate)
                 plant.UpdateGeneration();
         }
 

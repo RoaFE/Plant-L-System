@@ -31,6 +31,8 @@ public class Plant : MonoBehaviour
     public bool autoUpdate = false;
     public void Generate()
     {
+        bool renable = autoUpdate;
+        autoUpdate = false;
         System.Random prng = new System.Random(seed);
         if(rootNode == null)
         {
@@ -38,7 +40,8 @@ public class Plant : MonoBehaviour
             rootNode.InitNode(this,null);
         }
         rootNode.Extend(nodeDepth,Vector3.up,nodeDistance,prng); 
-        generated = true;       
+        generated = true;  
+        autoUpdate = renable;     
     }
 
     public void UpdateGeneration()
@@ -48,6 +51,11 @@ public class Plant : MonoBehaviour
             rootNode.UpdateGeneration(nodeDepth,Vector3.up,nodeDistance,prng);    
     }
     
+    public bool AutoUpdate()
+    {
+        return generated & autoUpdate;
+    }
+
     public void Clear()
     {
         if(rootNode != null)

@@ -29,7 +29,6 @@ public class Node : MonoBehaviour
         splitPlane = new Plane(planeNormal,transform.position);
     }
 
-    // Start is called before the first frame update
 
     public bool UpdateGeneration(int nodeDepth, Vector3 dir, float dist, System.Random prng)
     {
@@ -54,13 +53,17 @@ public class Node : MonoBehaviour
                 Vector3 direction = Quaternion.AngleAxis(angle,splitPlane.normal) * dir;
                 direction = Vector3.Lerp(direction,Vector3.up,plant.upwardBias/100f);
                 child.transform.position = transform.position + (direction * dist);
-                child.transform.localRotation = Quaternion.AngleAxis(prng.Next(plant.nodeRotationMin,plant.nodeRotationMax),dir);
+                int minRotation = Mathf.Min(plant.nodeRotationMin,plant.nodeRotationMax);
+                int maxRotation = Mathf.Min(plant.nodeRotationMin,plant.nodeRotationMax);
+                child.transform.localRotation = Quaternion.AngleAxis(prng.Next(minRotation,maxRotation),dir);
                 result &= child.UpdateGeneration(nodeDepth - 1,direction,dist,prng);
             }
             else
             {
                 child.transform.position = transform.position + (dir.normalized * dist);
-                child.transform.localRotation = Quaternion.AngleAxis(prng.Next(plant.nodeRotationMin,plant.nodeRotationMax),dir);
+                int minRotation = Mathf.Min(plant.nodeRotationMin,plant.nodeRotationMax);
+                int maxRotation = Mathf.Min(plant.nodeRotationMin,plant.nodeRotationMax);
+                child.transform.localRotation = Quaternion.AngleAxis(prng.Next(minRotation,maxRotation),dir);
                 result &= child.UpdateGeneration(nodeDepth - 1,dir,dist,prng);
             }
             i++;
@@ -97,7 +100,9 @@ public class Node : MonoBehaviour
                 direction = Vector3.Lerp(direction,Vector3.up,plant.upwardBias/100f);
                 GameObject obj = Instantiate(newObj,direction * dist,Quaternion.identity,this.transform);
                 obj.transform.position = transform.position + (direction * dist);
-                obj.transform.localRotation = Quaternion.AngleAxis(prng.Next(plant.nodeRotationMin,plant.nodeRotationMax),dir);
+                int minRotation = Mathf.Min(plant.nodeRotationMin,plant.nodeRotationMax);
+                int maxRotation = Mathf.Min(plant.nodeRotationMin,plant.nodeRotationMax);
+                obj.transform.localRotation = Quaternion.AngleAxis(prng.Next(minRotation,maxRotation),dir);
                 childNodes.Add(obj.AddComponent<Node>());
                 childNodes[i].InitNode(plant,this);
                 result &= childNodes[i].Extend(nodeDepth - 1,direction,dist,prng);
@@ -108,7 +113,9 @@ public class Node : MonoBehaviour
             GameObject newObj = new GameObject(string.Format("Node {0}",plant.nodeDepth - nodeDepth));
             GameObject obj = Instantiate(newObj,dir*dist,Quaternion.identity,this.transform);
             obj.transform.position = transform.position + (dir.normalized * dist);
-            obj.transform.localRotation = Quaternion.AngleAxis(prng.Next(plant.nodeRotationMin,plant.nodeRotationMax),dir);
+            int minRotation = Mathf.Min(plant.nodeRotationMin,plant.nodeRotationMax);
+                int maxRotation = Mathf.Min(plant.nodeRotationMin,plant.nodeRotationMax);
+            obj.transform.localRotation = Quaternion.AngleAxis(prng.Next(minRotation,maxRotation),dir);
             DestroyImmediate(newObj);
             childNodes.Add(obj.AddComponent<Node>());
             childNodes[childNodes.Count - 1].InitNode(plant,this);
