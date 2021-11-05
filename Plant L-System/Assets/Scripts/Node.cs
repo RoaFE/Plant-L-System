@@ -6,7 +6,7 @@ using UnityEngine;
 public class Node : MonoBehaviour
 {
     Plant plant;
-    Node parentNode;
+    public Node parentNode;
     List<Node> childNodes;
     public Vector3 position = Vector3.zero;
 
@@ -134,8 +134,9 @@ public class Node : MonoBehaviour
     public List<Node> GetParentNodes()
     {
         List<Node> parentNodes = new List<Node>();        
-        if(parentNode)
+        if(parentNode != null)
         {
+            parentNodes.Add(parentNode);
             parentNodes.AddRange(parentNode.GetParentNodes());
         }
         return parentNodes;
