@@ -30,7 +30,45 @@ public class Node : MonoBehaviour
     }
 
     // Start is called before the first frame update
-    public bool Extend(int nodeDepth, Vector3 dir, float dist)
+
+    public bool UpdateGeneration(int nodeDepth, Vector3 dir, float dist, System.Random prng)
+    {
+        if(nodeDepth < 1)
+        {
+            return true;
+        }
+        depth = nodeDepth;
+        Vector3 randomDir = new Vector3 (prng.Next(-100,100),prng.Next(-100,100),prng.Next(-100,100)).normalized;
+        dir = Vector3.Lerp(dir,randomDir,plant.randomisationPercentage);
+        dir = Vector3.Lerp(dir,Vector3.up,plant.upwardBias/100f);
+        bool result = true;
+
+        int i = 0;
+        foreach(Node child in childNodes)
+        {    
+            if(plant.nodeDepth - nodeDepth >= plant.splitDepth && ((plant.nodeDepth - nodeDepth) - plant.splitDepth) % plant.splitFrequency == 0)
+            {
+                float angleStep = plant.splitAngle / plant.splitCount;
+                float angle = angleStep * i + (angleStep / 2) - (plant.splitAngle / 2);
+                float percentage = angle / plant.splitAngle;
+                Vector3 direction = Quaternion.AngleAxis(angle,splitPlane.normal) * dir;
+                direction = Vector3.Lerp(direction,Vector3.up,plant.upwardBias/100f);
+                child.transform.position = transform.position + (direction * dist);
+                child.transform.localRotation = Quaternion.AngleAxis(prng.Next(plant.nodeRotationMin,plant.nodeRotationMax),dir);
+                result &= child.UpdateGeneration(nodeDepth - 1,direction,dist,prng);
+            }
+            else
+            {
+                child.transform.position = transform.position + (dir.normalized * dist);
+                child.transform.localRotation = Quaternion.AngleAxis(prng.Next(plant.nodeRotationMin,plant.nodeRotationMax),dir);
+                result &= child.UpdateGeneration(nodeDepth - 1,dir,dist,prng);
+            }
+            i++;
+
+        }
+        return result;
+    }
+    public bool Extend(int nodeDepth, Vector3 dir, float dist,System.Random prng)
     {
         if(childNodes.Count > 0)
         {
@@ -42,9 +80,9 @@ public class Node : MonoBehaviour
             return true;
         }
         depth = nodeDepth;
-        Vector3 randomDir = Random.insideUnitSphere.normalized;
+        Vector3 randomDir = new Vector3 (prng.Next(-100,100),prng.Next(-100,100),prng.Next(-100,100)).normalized;
         dir = Vector3.Lerp(dir,randomDir,plant.randomisationPercentage);
-        
+        dir = Vector3.Lerp(dir,Vector3.up,plant.upwardBias/100f);
         bool result = true;
         if(plant.nodeDepth - nodeDepth >= plant.splitDepth && ((plant.nodeDepth - nodeDepth) - plant.splitDepth) % plant.splitFrequency == 0)
         {
@@ -56,13 +94,13 @@ public class Node : MonoBehaviour
                 float angle = angleStep * i + (angleStep / 2) - (plant.splitAngle / 2);
                 float percentage = angle / plant.splitAngle;
                 Vector3 direction = Quaternion.AngleAxis(angle,splitPlane.normal) * dir;
-
-                GameObject obj = Instantiate(newObj,dir*dist,Quaternion.identity,this.transform);
+                direction = Vector3.Lerp(direction,Vector3.up,plant.upwardBias/100f);
+                GameObject obj = Instantiate(newObj,direction * dist,Quaternion.identity,this.transform);
                 obj.transform.position = transform.position + (direction * dist);
-                obj.transform.localRotation = Quaternion.AngleAxis(Random.Range(plant.nodeRotationMin,plant.nodeRotationMax),dir);
+                obj.transform.localRotation = Quaternion.AngleAxis(prng.Next(plant.nodeRotationMin,plant.nodeRotationMax),dir);
                 childNodes.Add(obj.AddComponent<Node>());
                 childNodes[i].InitNode(plant,this);
-                result &= childNodes[i].Extend(nodeDepth - 1,direction,dist);
+                result &= childNodes[i].Extend(nodeDepth - 1,direction,dist,prng);
             }
             DestroyImmediate(newObj);
         }
@@ -70,11 +108,11 @@ public class Node : MonoBehaviour
             GameObject newObj = new GameObject(string.Format("Node {0}",plant.nodeDepth - nodeDepth));
             GameObject obj = Instantiate(newObj,dir*dist,Quaternion.identity,this.transform);
             obj.transform.position = transform.position + (dir.normalized * dist);
-            obj.transform.localRotation = Quaternion.AngleAxis(Random.Range(plant.nodeRotationMin,plant.nodeRotationMax),dir);
+            obj.transform.localRotation = Quaternion.AngleAxis(prng.Next(plant.nodeRotationMin,plant.nodeRotationMax),dir);
             DestroyImmediate(newObj);
             childNodes.Add(obj.AddComponent<Node>());
             childNodes[childNodes.Count - 1].InitNode(plant,this);
-            result &= childNodes[childNodes.Count - 1].Extend(nodeDepth - 1,dir,dist);
+            result &= childNodes[childNodes.Count - 1].Extend(nodeDepth - 1,dir,dist,prng);
         }
         return result;
     } 

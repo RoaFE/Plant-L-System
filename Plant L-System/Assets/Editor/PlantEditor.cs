@@ -6,6 +6,7 @@ using UnityEditor;
 [CustomEditor(typeof(Plant))]
 public class PlantEditor : Editor 
 {
+    SerializedProperty nodeDist;
     private void OnSceneGUI() {
         Plant  plant = (Plant)target;
         List<Node> nodes = plant.GetRootNode().DebugGetNodes();
@@ -24,8 +25,16 @@ public class PlantEditor : Editor
         Handles.DrawWireArc(plant.transform.position,Vector3.up,Vector3.forward,360,0.5f);
     }
     public override void OnInspectorGUI() {
-        base.OnInspectorGUI();
         Plant  plant = (Plant)target;
+
+
+        if(DrawDefaultInspector())
+        {
+            if(plant.autoUpdate)
+                plant.UpdateGeneration();
+        }
+
+        //plant.UpdateGeneration();
         EditorGUILayout.Separator();   
         if (GUILayout.Button("Generate"))
                 plant.Generate();
