@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(MeshFilter),typeof(MeshRenderer))]
 public class Node : MonoBehaviour
 {
     Plant plant;
@@ -65,7 +66,7 @@ public class Node : MonoBehaviour
             }
             DestroyImmediate(newObj);
         }
-        {
+        else {
             GameObject newObj = new GameObject(string.Format("Node {0}",plant.nodeDepth - nodeDepth));
             GameObject obj = Instantiate(newObj,dir*dist,Quaternion.identity,this.transform);
             obj.transform.position = transform.position + (dir.normalized * dist);
@@ -123,5 +124,10 @@ public class Node : MonoBehaviour
     public List<Node> GetChildNodes()
     {        
         return childNodes;
+    }
+
+    public void constructMesh(int curveDepth)
+    {
+
     }
 }
